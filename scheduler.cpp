@@ -36,7 +36,9 @@ void Scheduler::runFCFS() {
 
     // Calculate and display average turnaround time for all processes
     double avgTurnaroundTime = Utils::calculateAverageTurnaroundTime(processes);
+    double avgWaitingTime = Utils::calculateAverageWaitingTime(processes);
     std::cout << "Average Turnaround Time (FCFS): " << avgTurnaroundTime << std::endl;
+    std::cout << "Average Waiting Time (FCFS): " << avgWaitingTime << std::endl;
 }
 
 void Scheduler::runSJF() {
@@ -68,7 +70,9 @@ void Scheduler::runSJF() {
 
     // Calculate and display average turnaround time for all processes
     double avgTurnaroundTime = Utils::calculateAverageTurnaroundTime(processes);
+    double avgWaitingTime = Utils::calculateAverageWaitingTime(processes);
     std::cout << "Average Turnaround Time (SJF): " << avgTurnaroundTime << std::endl;
+    std::cout << "Average Waiting Time (SJF): " << avgWaitingTime << std::endl;
 }
 
 void Scheduler::runPriorityScheduling() {
@@ -100,7 +104,9 @@ void Scheduler::runPriorityScheduling() {
 
     // Calculate and display average turnaround time for all processes
     double avgTurnaroundTime = Utils::calculateAverageTurnaroundTime(processes);
+    double avgWaitingTime = Utils::calculateAverageWaitingTime(processes);
     std::cout << "Average Turnaround Time (Priority Scheduling): " << avgTurnaroundTime << std::endl;
+    std::cout << "Average Waiting Time (Priority Scheduling): " << avgWaitingTime << std::endl;
 }
 
 void Scheduler::runRoundRobin(int timeSlice) {
