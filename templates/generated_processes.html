@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Processes</title>
+    <link rel="stylesheet" href="../static/css/generated_processes.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Generated Processes</h1>
+        <div class="processes">
+            {% for process in processes %}
+            <div class="process">
+                <p><strong>Arrival Time:</strong> {{ process.arrival_time }}</p>
+                <p><strong>Burst Time:</strong> {{ process.burst_time }}</p>
+                {% if process.priority %}
+                <p><strong>Priority:</strong> {{ process.priority }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

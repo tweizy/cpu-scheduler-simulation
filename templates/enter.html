@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Processes</title>
+    <link rel="stylesheet" href="../static/css/enter.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Enter Processes</h1>
+        <form action="/enter" method="post" class="form">
+            <div class="form-group">
+                <label for="num_processes">Number of Processes:</label>
+                <input type="number" id="num_processes" name="num_processes" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="priority_applicable">Priority Applicable:</label>
+                <input type="checkbox" id="priority_applicable" name="priority_applicable" value="yes">
+            </div>
+            <button type="submit" class="btn-submit">Create Processes</button>
+        </form>
+
+        {% if num_processes %}
+        <h2 class="subtitle">Enter Process Details</h2>
+        <form action="/enter" method="post" class="form">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Process</th>
+                        <th>Arrival Time</th>
+                        <th>Burst Time</th>
+                        <th>{% if priority_applicable == 'yes' %} Priority {% else %} Priority (N/A) {% endif %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(num_processes) %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><input type="number" name="arrival_time_{{ loop.index }}" min="0" required></td>
+                        <td><input type="number" name="burst_time_{{ loop.index }}" min="1" required></td>
+                        <td>
+                            {% if 'priority_applicable' in request.form and request.form['priority_applicable'] == 'yes' %}
+                                <input type="number" name="priority_{{ loop.index }}" min="1" required>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn-submit">Submit</button>
+        </form>
+        {% endif %}
+    </div>
+</body>
+</html>

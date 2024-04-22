@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Random Processes</title>
+    <link rel="stylesheet" href="../static/css/generate.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Generate Random Processes</h1>
+        <form action="/generate" method="post" class="form">
+            <div class="form-group">
+                <label for="num_processes">Number of Processes:</label>
+                <input type="number" id="num_processes" name="num_processes" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="arrival_time_range">Arrival Time Range (min, max):</label>
+                <input type="text" id="arrival_time_range" name="arrival_time_range" placeholder="e.g., 0, 10" required>
+            </div>
+            <div class="form-group">
+                <label for="burst_time_range">Burst Time Range (min, max):</label>
+                <input type="text" id="burst_time_range" name="burst_time_range" placeholder="e.g., 1, 20" required>
+            </div>
+            <div class="form-group">
+                <label for="priority_range">Priority Range (min, max): (if applicable)</label>
+                <input type="text" id="priority_range" name="priority_range" placeholder="e.g., 1, 5" >
+            </div>
+            <button type="submit" class="btn-submit">Generate Processes</button>
+        </form>
+    </div>
+</body>
+</html>
