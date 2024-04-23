@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entered Processes</title>
+    <link rel="stylesheet" href="../static/css/entered_processes.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Entered Processes</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th>Arrival Time</th>
+                    <th>Burst Time</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for process in processes %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ process['arrival_time'] }}</td>
+                    <td>{{ process['burst_time'] }}</td>
+                    <td>{{ process['priority'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

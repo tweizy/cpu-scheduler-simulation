@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Process Details</title>
+    <link rel="stylesheet" href="../static/css/enter.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Enter Process Details</h1>
+        <form action="/enter_details" method="post" class="form">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Process</th>
+                        <th>Arrival Time</th>
+                        <th>Burst Time</th>
+                        <th>{% if priority_applicable %} Priority {% else %} Priority (N/A) {% endif %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in range(num_processes) %}
+                    <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td><input type="number" name="arrival_time_{{ i }}" min="0" required></td>
+                        <td><input type="number" name="burst_time_{{ i }}" min="1" required></td>
+                        <td>
+                            {% if priority_applicable %}
+                                <input type="number" name="priority_{{ i }}" min="1" required>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn-submit">Submit</button>
+        </form>
+    </div>
+</body>
+</html>
