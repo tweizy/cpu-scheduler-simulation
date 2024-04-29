@@ -32,10 +32,10 @@ for process in processes:
 
 # Create a scheduler instance and run the FCFS algorithm
 scheduler = Scheduler(processes)
-scheduler.run_FCFS()
+# scheduler.run_FCFS()
 # scheduler.run_SJF()
 # scheduler.run_priority_scheduling()
-# scheduler.run_round_robin(5)
+scheduler.run_round_robin(2)
 # scheduler.run_priority_rr()
 
 # Alternatively, you can call the display_results method to print out the results
