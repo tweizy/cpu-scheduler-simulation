@@ -52,6 +52,7 @@ def enter():
 def enter_details():
     num_processes = session.get('num_processes')
     priority_applicable = session.get('priority_applicable')
+    selected_algorithms = request.form.getlist('algorithm[]')  # Retrieve selected algorithms from the form
     if num_processes is None:
         return redirect(url_for('enter'))
     if request.method == 'POST':
@@ -60,14 +61,13 @@ def enter_details():
             arrival_time = request.form[f'arrival_time_{i}']
             burst_time = request.form[f'burst_time_{i}']
             priority = request.form.get(f'priority_{i}') if priority_applicable else "N/A"
+
             processes.append({
                 'arrival_time': arrival_time,
                 'burst_time': burst_time,
                 'priority': priority
             })
-        return render_template('entered_processes.html', processes=processes)
+        return render_template('entered_processes.html', processes=processes, selected_algorithms=selected_algorithms)
     return render_template('enter_details.html', num_processes=num_processes, priority_applicable=priority_applicable)
-
-
 if __name__ == '__main__':
     app.run(debug=True)

@@ -37,6 +37,22 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div class="container">
+    <h1 class="title">Algorithm Selection</h1>
+    <form action="/run_algorithm" method="post" class="form">
+                <div class="form-group">
+            <label>Select Scheduling Algorithm(s):</label><br>
+            <input type="checkbox" name="algorithm[]" id="FCFS" value="FCFS">
+            <label for="FCFS">First-Come, First-Served (FCFS)</label><br>
+            <input type="checkbox" name="algorithm[]" id="SJF" value="SJF">
+            <label for="SJF">Shortest Job First (SJF)</label><br>
+            <input type="checkbox" name="algorithm[]" id="Priority" value="Priority">
+            <label for="Priority">Priority Scheduling</label><br>
+            <input type="checkbox" name="algorithm[]" id="RR" value="RR">
+            <label for="RR">Round Robin (RR)</label><br>
+            <input type="checkbox" name="algorithm[]" id="Priority_RR" value="Priority_RR">
+            <label for="Priority_RR">Priority Scheduling + RR</label><br>
+        </div>
             <button type="submit" class="btn-submit">Submit</button>
         </form>
     </div>
