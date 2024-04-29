@@ -21,7 +21,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for i in range(num_processes) %}
+                    {% for i in range(num_processes|int) %}
                     <tr>
                         <td>{{ i + 1 }}</td>
                         <td><input type="number" name="arrival_time_{{ i }}" min="0" required></td>
@@ -39,7 +39,6 @@
             </table>
             <div class="container">
     <h1 class="title">Algorithm Selection</h1>
-    <form action="/run_algorithm" method="post" class="form">
                 <div class="form-group">
             <label>Select Scheduling Algorithm(s):</label><br>
             <input type="checkbox" name="algorithm[]" id="FCFS" value="FCFS">

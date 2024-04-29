@@ -2,8 +2,12 @@ from process import Process
 from utils import *
 
 class Scheduler:
-    def __init__(self, processes : list[Process]):
+    def __init__(self, processes):
         self.processes = processes
+        self.total_turnaround_time = 0.0
+        self.total_waiting_time = 0.0
+        self.avg_turnaround_time =0.0
+        self.avg_waiting_time = 0.0
 
     def run_FCFS(self):
         # Sort processes based on arrival time
@@ -31,8 +35,12 @@ class Scheduler:
         # Calculate and display average turnaround time for all processes
         avg_turnaround_time = calculate_average_turnaround_time(self.processes)
         avg_waiting_time = calculate_average_waiting_time(self.processes)
+        total_turnaround_time = calculate_total_turnaround_time(self.processes)
+        total_waiting_time = calculate_total_waiting_time(self.processes)
         print(f"Average Turnaround Time (FCFS): {avg_turnaround_time}")
         print(f"Average Waiting Time (FCFS): {avg_waiting_time}")
+        print(f"Total Turnaround Time (FCFS): {total_turnaround_time}")
+        print(f"Total Waiting Time (FCFS): {total_waiting_time}")
 
     def run_SJF(self):
         # Sort processes based on arrival time

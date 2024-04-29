@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 import random
-
+from process import Process
+from scheduler import Scheduler
+import utils
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
 
@@ -48,6 +50,7 @@ def enter():
         return redirect(url_for('enter_details'))
     return render_template('enter.html')
 
+
 @app.route('/enter_details', methods=['GET', 'POST'])
 def enter_details():
     num_processes = session.get('num_processes')
@@ -55,6 +58,7 @@ def enter_details():
     selected_algorithms = request.form.getlist('algorithm[]')  # Retrieve selected algorithms from the form
     if num_processes is None:
         return redirect(url_for('enter'))
+    print(request.method)
     if request.method == 'POST':
         processes = []
         for i in range(num_processes):
@@ -67,7 +71,61 @@ def enter_details():
                 'burst_time': burst_time,
                 'priority': priority
             })
-        return render_template('entered_processes.html', processes=processes, selected_algorithms=selected_algorithms)
-    return render_template('enter_details.html', num_processes=num_processes, priority_applicable=priority_applicable)
+        # Store form data in the session
+        session['entered_processes_data'] = {
+            'processes': processes,
+            'selected_algorithms': selected_algorithms
+        }
+        return redirect(url_for('entered_processes'))  # Redirect to the entered_processes route
+    else:
+        print("basma")
+        return render_template('enter_details.html', num_processes=num_processes, priority_applicable=priority_applicable)
+
+
+@app.route('/entered_processes', methods=['POST','GET'])
+def entered_processes():
+    # Retrieve entered details from the session
+    entered_processes_data = session.get('entered_processes_data')
+    if entered_processes_data is None:
+        # Handle case where session data is missing or invalid
+        return redirect(url_for('enter'))
+
+    processes = entered_processes_data['processes']
+    selected_algorithms = entered_processes_data['selected_algorithms']
+
+    # Get priority applicability from session
+    priority_applicable = session.get('priority_applicable')
+
+    # Initialize variables to store FCFS results
+    fcfs_results = None
+
+    # Check if FCFS algorithm is selected
+    if 'FCFS' in selected_algorithms:
+        # Process the form data to create a list of Process objects
+        processes = []
+        for i, process_data in enumerate(entered_processes_data['processes']):
+            arrival_time = int(process_data['arrival_time'])
+            burst_time = int(process_data['burst_time'])
+            priority = int(process_data['priority']) if priority_applicable else "N/A"
+            processes.append(Process(i + 1, arrival_time, burst_time, priority))
+
+        # Create a scheduler with the entered processes
+        scheduler = Scheduler(processes)
+
+        # Run FCFS algorithm
+        scheduler.run_FCFS()
+
+        # Store FCFS algorithm results
+        fcfs_results = {
+            'avg_turnaround_time': utils.calculate_average_turnaround_time(processes),
+            'avg_waiting_time': utils.calculate_average_waiting_time(processes),
+            'total_turnaround_time': utils.calculate_total_turnaround_time(processes),
+            'total_waiting_time': utils.calculate_total_waiting_time(processes),
+        }
+
+    # Pass the entered processes, selected algorithms, and FCFS algorithm results to the template
+    return render_template('entered_processes.html', processes=processes, selected_algorithms=selected_algorithms, fcfs_results=fcfs_results)
+
+
 if __name__ == '__main__':
     app.run(debug=True)

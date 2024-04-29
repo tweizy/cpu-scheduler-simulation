@@ -18,14 +18,30 @@ def calculate_average_turnaround_time(processes):
     total_turnaround_time = 0.0
     print("Turnaround:")
     for process in processes:
-        print(f"{process.get_finish_time() - process.get_arrival_time()} + ")
-        total_turnaround_time += (process.get_finish_time() - process.get_arrival_time())
+        print(f"{process.finish_time - process.arrival_time} + ")
+        total_turnaround_time += (process.finish_time - process.arrival_time)
+
     return total_turnaround_time / len(processes)
+
+def calculate_total_turnaround_time(processes):
+    total_turnaround_time = 0.0
+    print("Turnaround:")
+    for process in processes:
+        print(f"{process.finish_time - process.arrival_time} + ")
+        total_turnaround_time += (process.finish_time - process.arrival_time)
+    return total_turnaround_time
 
 def calculate_average_waiting_time(processes):
     total_waiting_time = 0.0
     print("Waiting time:")
     for process in processes:
-        print(f"{(process.get_finish_time() - process.get_arrival_time()) - process.get_burst_time()} + ")
-        total_waiting_time += (process.get_finish_time() - process.get_arrival_time()) - process.get_burst_time()
+        print(f"{(process.finish_time - process.arrival_time) - process.burst_time} + ")
+        total_waiting_time += (process.finish_time - process.arrival_time) - process.burst_time
     return total_waiting_time / len(processes)
+def calculate_total_waiting_time(processes):
+    total_waiting_time = 0.0
+    print("Waiting time:")
+    for process in processes:
+        print(f"{(process.finish_time - process.arrival_time) - process.burst_time} + ")
+        total_waiting_time += (process.finish_time - process.arrival_time) - process.burst_time
+    return total_waiting_time

@@ -39,6 +39,16 @@
         </ul>
 
 </div>
+{% if fcfs_results %}
+<div>
+    <h2>FCFS Results</h2>
+    <p>Average Turnaround Time: {{ fcfs_results.avg_turnaround_time }}</p>
+    <p>Average Waiting Time: {{ fcfs_results.avg_waiting_time }}</p>
+    <p>Total Turnaround Time: {{ fcfs_results.total_turnaround_time }}</p>
+    <p>Total Waiting Time: {{ fcfs_results.total_waiting_time }}</p>
+</div>
+{% endif %}
+
 
 </body>
 </html>
