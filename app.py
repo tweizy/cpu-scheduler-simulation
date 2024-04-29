@@ -7,6 +7,7 @@ app.secret_key = 'your_secret_key'  # Set a secret key for session management
 @app.route('/')
 def menu():
     return render_template('menu.html')
+
 def generate_random_processes(num_processes, arrival_range, burst_range, priority_range=None):
     processes = []
     for _ in range(num_processes):

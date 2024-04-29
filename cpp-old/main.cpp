@@ -24,12 +24,12 @@ int main() {
     Scheduler scheduler(processes);
 
     // Simulate FCFS scheduling algorithm
-    std::cout << "Simulating FCFS Scheduling..." << std::endl;
-    scheduler.runFCFS();
+    // std::cout << "Simulating FCFS Scheduling..." << std::endl;
+    // scheduler.runFCFS();
     std::cout << "Simulating SJF Scheduling..." << std::endl;
     scheduler.runSJF();
-    std::cout << "Simulating Priority Scheduling..." << std::endl;
-    scheduler.runPriorityScheduling();
+    // std::cout << "Simulating Priority Scheduling..." << std::endl;
+    // scheduler.runPriorityScheduling();
 
     return 0;
 }
