@@ -124,7 +124,7 @@ class Scheduler:
 
         while any(remaining_time):
             for i, process in enumerate(self.processes):
-                if remaining_time[i] == 0:
+                if remaining_time[i] == 0 or process.arrival_time > current_time:
                     continue
                 
                 # Execute the process for the time slice or remaining burst time, whichever is smaller
