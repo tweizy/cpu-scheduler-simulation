@@ -8,7 +8,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from datetime import timedelta
 
-import json
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
 
@@ -68,23 +67,23 @@ def enter_details():
     if request.method == 'POST':
         processes = []
         for i in range(num_processes):
-            process_id = i+1
             arrival_time = request.form[f'arrival_time_{i}']
             burst_time = request.form[f'burst_time_{i}']
-            priority = request.form.get(f'priority_{i}') if priority_applicable else "N/A"
+            priority = request.form.get(f'priority_{i}') if priority_applicable else None
 
-            processes.append({
-                'process_id' : process_id,
-                'arrival_time': arrival_time,
-                'burst_time': burst_time,
-                'priority': priority
-            })
-            print(processes)
+            processes.append(Process(i+1,arrival_time,burst_time,priority))
+        processes = [process.to_dict() for process in processes]
+
+        # Sort processes by ID
+        processes = sorted(processes, key=lambda x: int(x['process_id']))
+        print("eeede")
+        print(process)
         # Store form data in the session
         session['entered_processes_data'] = {
             'processes': processes,
             'selected_algorithms': selected_algorithms
         }
+
         return redirect(url_for('entered_processes'))  # Redirect to the entered_processes route
     else:
         print("basma")
@@ -188,11 +187,10 @@ def entered_processes():
         plt.savefig('static/gantt_chart1.png')
 
     # Convert execution_data to JSON string
-    execution_data_json = json.dumps(execution_data)
 
 
     # Pass the entered processes, selected algorithms, and FCFS algorithm results to the template
-    return render_template('entered_processes.html', processes=processes, selected_algorithms=selected_algorithms, fcfs_results=fcfs_results, execution_data=execution_data_json)
+    return render_template('entered_processes.html', processes=processes, selected_algorithms=selected_algorithms, fcfs_results=fcfs_results, execution_data=execution_data)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -6,4 +6,15 @@ class Process:
         self.priority = priority
         self.finish_time = None
 
+    @staticmethod
+    def sort_by_id(processes):
+            return sorted(processes, key=lambda x: x.id)
+
+    def to_dict(self):
+        return {
+            'process_id': self.id,
+            'arrival_time': self.arrival_time,
+            'burst_time': self.burst_time,
+            'priority': self.priority
+        }
 

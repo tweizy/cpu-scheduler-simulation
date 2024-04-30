@@ -23,10 +23,10 @@
             <tbody>
                 {% for process in processes %}
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ process['arrival_time'] }}</td>
-                    <td>{{ process['burst_time'] }}</td>
-                    <td>{{ process['priority'] }}</td>
+                    <td>{{process.id}}</td>
+                    <td>{{ process.arrival_time}}</td>
+                    <td>{{ process.burst_time}}</td>
+                    <td>{{ process.priority}}</td>
                 </tr>
                 {% endfor %}
             </tbody>
