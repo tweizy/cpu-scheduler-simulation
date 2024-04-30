@@ -192,6 +192,17 @@
 
 {% endif %}
 
+<div class="img-container">
+    <h2>Comparaison of the selected algorithms : </h2>
+    <div style="display: inline-block;">
+            <img src="{{ url_for('static', filename='total_turnaround_times.png') }}" alt="Total Turnaround Chart" style="max-width: 45%;">
+            <img src="{{ url_for('static', filename='total_waiting_times.png') }}" alt="Total Waiting Chart" style="max-width: 45%;">
+        </div>
+    <h4>Best turn around time algorithm : {{bt}}</h4><br>
+    <h4>Best waiting time algorithm : {{bw}}</h4><br>
+
+
+</div>
 
 
 </body>

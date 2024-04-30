@@ -162,6 +162,7 @@ def entered_processes():
     priority_results = []
     execution_data = []
     rr_results = []
+    algo_results = {}
     # Check if FCFS algorithm is selected
     if 'FCFS' in selected_algorithms:
         # Run FCFS algorithm
@@ -262,6 +263,7 @@ def entered_processes():
         plt.xticks(range(1, len(turnaround_times) + 1))
         plt.savefig('static/turnaround_time_fcfs.png')
         plt.close('all')
+        algo_results['FCFS'] = (fcfs_results['total_turnaround_time'],fcfs_results['total_waiting_time'])
 
     if 'SJF' in selected_algorithms:
         # Run SJF algorithm
@@ -355,6 +357,8 @@ def entered_processes():
         plt.xticks(range(1, len(turnaround_times) + 1))
         plt.savefig('static/turnaround_time_sjf.png')
         plt.close('all')
+        algo_results['SJF'] = (sjf_results['total_turnaround_time'],sjf_results['total_waiting_time'])
+
 
     if 'Priority' in selected_algorithms:
         # Run Priority Scheduling algorithm
@@ -435,6 +439,9 @@ def entered_processes():
         plt.title('Turnaround Time for Each Process (Priority Scheduling)')
         plt.xticks(range(1, len(turnaround_times) + 1))
         plt.savefig('static/turnaround_time_priority.png')
+
+        algo_results['priority'] = (priority_results['total_turnaround_time'],priority_results['total_waiting_time'])
+
 
     if 'RR' in selected_algorithms:
         # Run Round Robin algorithm
@@ -536,11 +543,48 @@ def entered_processes():
         plt.title('Turnaround Time for Each Process (Round Robin)')
         plt.xticks(range(1, len(turnaround_times) + 1))
         plt.savefig('static/turnaround_time_rr.png')
+        algo_results['rr'] = (rr_results['total_turnaround_time'],rr_results['total_waiting_time'])
+
+    algo_names = [i for i in algo_results]
 
     scheduler.processes.sort(key=lambda x: x.id)
     num_processes = len(scheduler.processes)
+    total_turnaround_times = [algo_results[algo][0] for algo in algo_names]
+    total_waiting_times = [algo_results[algo][1] for algo in algo_names]
+
+    # Plotting total waiting times
+    plt.figure(figsize=(10, 6))
+    plt.bar(algo_names, total_waiting_times, color='purple')
+    plt.xlabel('Algorithm')
+    plt.ylabel('Total Waiting Time')
+    plt.title('Total Waiting Time for Each Algorithm')
+    plt.xticks(rotation=45)
+    plt.grid(True, linestyle='--', linewidth=0.5)
+    plt.tight_layout()
+    plt.savefig('static/total_waiting_times.png')
+    plt.close()
+
+    # Plotting total turnaround times
+    plt.figure(figsize=(10, 6))
+    plt.bar(algo_names, total_turnaround_times, color='red')
+    plt.xlabel('Algorithm')
+    plt.ylabel('Total Turnaround Time')
+    plt.title('Total Turnaround Time for Each Algorithm')
+    plt.xticks(rotation=45)
+    plt.grid(True, linestyle='--', linewidth=0.5)
+    plt.tight_layout()
+    plt.savefig('static/total_turnaround_times.png')
+    plt.close()
+
+    # Determine the best algorithm based on total waiting time and total turnaround time
+    best_waiting_algo = min(algo_names, key=lambda x: algo_results[x][1])
+    best_turnaround_algo = min(algo_names, key=lambda x: algo_results[x][0])
+
+    # Print the results
+    print(f'Best algorithm in terms of total waiting time: {best_waiting_algo}')
+    print(f'Best algorithm in terms of total turnaround time: {best_turnaround_algo}')
     # Pass the entered processes, selected algorithms, and FCFS algorithm results to the template
-    return render_template('entered_processes.html', processes=scheduler.processes, selected_algorithms=selected_algorithms, sjf_results=sjf_results, fcfs_results=fcfs_results, execution_data=execution_data, num_processes = num_processes, priority_results = priority_results, rr_results = rr_results)
+    return render_template('entered_processes.html', processes=scheduler.processes, selected_algorithms=selected_algorithms, sjf_results=sjf_results, fcfs_results=fcfs_results, execution_data=execution_data, num_processes = num_processes, priority_results = priority_results, rr_results = rr_results, algo_results = algo_results, bt = best_turnaround_algo, bw = best_waiting_algo)
 
 if __name__ == '__main__':
     app.run(debug=True)
