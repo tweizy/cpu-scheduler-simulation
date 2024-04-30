@@ -14,6 +14,7 @@ class Scheduler:
         self.processes.sort(key=lambda x: x.arrival_time)
 
         current_time = 0
+        gantt = []
         for process in self.processes:
             # Ensure current time is at least the arrival time of the current process
             if current_time < process.arrival_time:
@@ -21,7 +22,7 @@ class Scheduler:
 
             # Execute the process
             print(f"Executing Process {process.id} at Time {current_time}")
-
+            gantt.append((process.id,process.burst_time))
             # Update current time to account for process burst time
             current_time += process.burst_time
 
@@ -41,6 +42,7 @@ class Scheduler:
         print(f"Average Waiting Time (FCFS): {avg_waiting_time}")
         print(f"Total Turnaround Time (FCFS): {total_turnaround_time}")
         print(f"Total Waiting Time (FCFS): {total_waiting_time}")
+        return gantt
 
     def run_SJF(self):
         # Sort processes based on arrival time

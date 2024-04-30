@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entered Processes</title>
     <link rel="stylesheet" href="../static/css/entered_processes.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     {% include 'home_button.html' %}
@@ -31,24 +32,46 @@
             </tbody>
         </table>
     </div>
-        <h2>Selected Algorithms:</h2>
+    <h2>Selected Algorithms:</h2>
+    <div class="selected-algos">
         <ul>
             {% for algorithm in selected_algorithms %}
-                <li>{{ algorithm }}</li>
+            <li>{{ algorithm }}</li>
             {% endfor %}
         </ul>
+    </div>
 
-</div>
-{% if fcfs_results %}
-<div>
-    <h2>FCFS Results</h2>
-    <p>Average Turnaround Time: {{ fcfs_results.avg_turnaround_time }}</p>
-    <p>Average Waiting Time: {{ fcfs_results.avg_waiting_time }}</p>
-    <p>Total Turnaround Time: {{ fcfs_results.total_turnaround_time }}</p>
-    <p>Total Waiting Time: {{ fcfs_results.total_waiting_time }}</p>
-</div>
-{% endif %}
-
-
+    <div class="img-container">
+        {% if fcfs_results %}
+        <h2>FCFS Results</h2>
+        <table class="fcfs-results-table">
+            <thead>
+                <tr>
+                    <th>Statistic</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Average Turnaround Time</td>
+                    <td>{{ fcfs_results.avg_turnaround_time }}</td>
+                </tr>
+                <tr>
+                    <td>Average Waiting Time</td>
+                    <td>{{ fcfs_results.avg_waiting_time }}</td>
+                </tr>
+                <tr>
+                    <td>Total Turnaround Time</td>
+                    <td>{{ fcfs_results.total_turnaround_time }}</td>
+                </tr>
+                <tr>
+                    <td>Total Waiting Time</td>
+                    <td>{{ fcfs_results.total_waiting_time }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <img src="{{ url_for('static', filename='gantt_chart1.png') }}" alt="Gantt Chart">
+        {% endif %}
+    </div>
 </body>
 </html>

@@ -1,8 +1,14 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, jsonify
 import random
 from process import Process
 from scheduler import Scheduler
 import utils
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from datetime import timedelta
+
+import json
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Set a secret key for session management
 
@@ -62,15 +68,18 @@ def enter_details():
     if request.method == 'POST':
         processes = []
         for i in range(num_processes):
+            process_id = i+1
             arrival_time = request.form[f'arrival_time_{i}']
             burst_time = request.form[f'burst_time_{i}']
             priority = request.form.get(f'priority_{i}') if priority_applicable else "N/A"
 
             processes.append({
+                'process_id' : process_id,
                 'arrival_time': arrival_time,
                 'burst_time': burst_time,
                 'priority': priority
             })
+            print(processes)
         # Store form data in the session
         session['entered_processes_data'] = {
             'processes': processes,
@@ -80,6 +89,8 @@ def enter_details():
     else:
         print("basma")
         return render_template('enter_details.html', num_processes=num_processes, priority_applicable=priority_applicable)
+
+
 
 
 @app.route('/entered_processes', methods=['POST','GET'])
@@ -104,16 +115,29 @@ def entered_processes():
         # Process the form data to create a list of Process objects
         processes = []
         for i, process_data in enumerate(entered_processes_data['processes']):
+            id = int(process_data['process_id'])
             arrival_time = int(process_data['arrival_time'])
             burst_time = int(process_data['burst_time'])
             priority = int(process_data['priority']) if priority_applicable else "N/A"
-            processes.append(Process(i + 1, arrival_time, burst_time, priority))
+            processes.append(Process(id, arrival_time, burst_time, priority))
 
         # Create a scheduler with the entered processes
         scheduler = Scheduler(processes)
 
         # Run FCFS algorithm
-        scheduler.run_FCFS()
+        gantt = scheduler.run_FCFS()
+        execution_data = []
+
+        # Process the gantt data to create execution intervals
+        current_time = 0
+        for process_id in gantt:
+            start_time = current_time
+            end_time = current_time + process_id[1]  # Assuming each process executes for 1 unit of time
+            execution_data.append({'process_id': process_id[0], 'start_time': start_time, 'end_time': end_time})
+            current_time = end_time
+
+        # Sort execution_data by process IDs
+        execution_data.sort(key=lambda x: x['process_id'])
 
         # Store FCFS algorithm results
         fcfs_results = {
@@ -122,10 +146,53 @@ def entered_processes():
             'total_turnaround_time': utils.calculate_total_turnaround_time(processes),
             'total_waiting_time': utils.calculate_total_waiting_time(processes),
         }
+        print(execution_data)
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Set up the axes formatting
+        ax.set_ylim(0.5, len(execution_data) + 0.5)
+        ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Processes')
+        ax.set_yticks(range(1, len(execution_data) + 1))
+        ax.set_yticklabels([f'Process {ed["process_id"]}' for ed in execution_data])
+
+        # Change x-axis locator to integer increments
+        ax.xaxis.set_major_locator(plt.MultipleLocator(1))
+
+        # Format x-axis labels as integers without leading zeros
+        def format_x_ticks(x, pos=None):
+            return f'{int(x):d}'
+
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(format_x_ticks))
+
+        # Set grid for better readability
+        ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5)
+
+        # Plot each process on the Gantt chart
+        # Plot each process on the Gantt chart
+        # Plot each process on the Gantt chart
+        for i, ed in enumerate(execution_data, start=1):
+            start_time = ed['start_time']
+            end_time = ed['end_time']
+            duration = end_time - start_time
+            ax.barh(i, duration, left=start_time, height=0.4, align='center')
+
+            # Annotate the bars with process IDs
+            ax.text(start_time + duration / 2, i, f'Process {ed["process_id"]}', ha='center', va='center')
+
+            # Set x-axis limits based on the start and end times
+            ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
+
+        # Save the figure to a file
+        plt.savefig('static/gantt_chart1.png')
+
+    # Convert execution_data to JSON string
+    execution_data_json = json.dumps(execution_data)
+
 
     # Pass the entered processes, selected algorithms, and FCFS algorithm results to the template
-    return render_template('entered_processes.html', processes=processes, selected_algorithms=selected_algorithms, fcfs_results=fcfs_results)
-
+    return render_template('entered_processes.html', processes=processes, selected_algorithms=selected_algorithms, fcfs_results=fcfs_results, execution_data=execution_data_json)
 
 if __name__ == '__main__':
     app.run(debug=True)
