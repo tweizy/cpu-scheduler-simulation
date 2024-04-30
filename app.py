@@ -63,8 +63,7 @@ def generate():
         # Redirect to the route for displaying generated processes
         return redirect(url_for('entered_processes'))  # Redirect to the entered_processes route
 
-    return render_template('generate.html', num_processes=num_processes,
-                           time_slice=time_slice)
+    return render_template('generate.html')
 
 
 @app.route('/generated_processes')
@@ -165,8 +164,6 @@ def entered_processes():
     rr_results = []
     # Check if FCFS algorithm is selected
     if 'FCFS' in selected_algorithms:
-        # Process the form data to create a list of Process objects
-
         # Run FCFS algorithm
         gantt = scheduler.run_FCFS()
         scheduler.processes = processes
@@ -182,6 +179,7 @@ def entered_processes():
 
         # Sort execution_data by process IDs
         execution_data.sort(key=lambda x: x['process_id'])
+
         # Store FCFS algorithm results
         fcfs_results = {
             'avg_turnaround_time': utils.calculate_average_turnaround_time(scheduler.processes),
@@ -189,8 +187,29 @@ def entered_processes():
             'total_turnaround_time': utils.calculate_total_turnaround_time(scheduler.processes),
             'total_waiting_time': utils.calculate_total_waiting_time(scheduler.processes),
         }
-        print(execution_data)
+
+        # Define a colormap
+        cmap = plt.get_cmap('tab10')  # You can choose any colormap here
+
+        # Create a dictionary to store process colors
+        process_colors = {}
+
+        # Plot Gantt chart for FCFS
         fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Plot each process on the Gantt chart
+        for i, ed in enumerate(execution_data, start=1):
+            start_time = ed['start_time']
+            end_time = ed['end_time']
+            duration = end_time - start_time
+
+            # Assign a color to the process based on its ID
+            color = cmap(i % 10)  # Limiting to 10 colors for simplicity, adjust as needed
+
+            ax.barh(i, duration, left=start_time, height=0.4, align='center', color=color)
+
+            # Annotate the bars with process IDs
+            ax.text(start_time + duration / 2, i, f'Process {ed["process_id"]}', ha='center', va='center')
 
         # Set up the axes formatting
         ax.set_ylim(0.5, len(execution_data) + 0.5)
@@ -212,32 +231,43 @@ def entered_processes():
         # Set grid for better readability
         ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5)
 
-        # Plot each process on the Gantt chart
-        # Plot each process on the Gantt chart
-        # Plot each process on the Gantt chart
-        for i, ed in enumerate(execution_data, start=1):
-            start_time = ed['start_time']
-            end_time = ed['end_time']
-            duration = end_time - start_time
-            ax.barh(i, duration, left=start_time, height=0.4, align='center')
-
-            # Annotate the bars with process IDs
-            ax.text(start_time + duration / 2, i, f'Process {ed["process_id"]}', ha='center', va='center')
-
-            # Set x-axis limits based on the start and end times
-            ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
-
         # Save the figure to a file
         plt.savefig('static/gantt_chart1.png')
 
+        # Calculate waiting time and turnaround time for each process
+        waiting_times = []
+        turnaround_times = []
+        for i in range(len(processes)):
+            process = utils.find_process_by_id(i+1,scheduler.processes)
+            waiting_time = process.waiting
+            turnaround_time = process.turnaround
+            waiting_times.append(waiting_time)
+            turnaround_times.append(turnaround_time)
+
+        # Plot bar plot for waiting time
+        plt.figure(figsize=(8, 6))
+        plt.bar(range(1, len(waiting_times) + 1), waiting_times, color='skyblue')
+        plt.xlabel('Process ID')
+        plt.ylabel('Waiting Time')
+        plt.title('Waiting Time for Each Process (FCFS)')
+        plt.xticks(range(1, len(waiting_times) + 1))
+        plt.savefig('static/waiting_time_fcfs.png')
+
+        # Plot bar plot for turnaround time
+        plt.figure(figsize=(8, 6))
+        plt.bar(range(1, len(turnaround_times) + 1), turnaround_times, color='lightgreen')
+        plt.xlabel('Process ID')
+        plt.ylabel('Turnaround Time')
+        plt.title('Turnaround Time for Each Process (FCFS)')
+        plt.xticks(range(1, len(turnaround_times) + 1))
+        plt.savefig('static/turnaround_time_fcfs.png')
+        plt.close('all')
+
     if 'SJF' in selected_algorithms:
-
-
         # Run SJF algorithm
         gantt = scheduler.run_SJF()
 
         execution_data = []
-        print("bbbb"+str(len(processes)))
 
         # Process the gantt data to create execution intervals
         current_time = 0
@@ -258,44 +288,74 @@ def entered_processes():
             'total_turnaround_time': utils.calculate_total_turnaround_time(scheduler.processes),
             'total_waiting_time': utils.calculate_total_waiting_time(scheduler.processes),
         }
-        print(execution_data)
-        fig, ax = plt.subplots(figsize=(10, 6))
 
-        # Set up the axes formatting
+        # Calculate waiting time and turnaround time for each process
+        waiting_times = []
+        turnaround_times = []
+        current_time = 0
+        for i in range(len(processes)):
+            process = utils.find_process_by_id(i+1, scheduler.processes)
+            turnaround_time = process.turnaround
+            waiting_time = process.waiting
+            waiting_times.append(waiting_time)
+            turnaround_times.append(turnaround_time)
+
+        # Plot Gantt chart
+        fig, ax = plt.subplots(figsize=(10, 6))
         ax.set_ylim(0.5, len(execution_data) + 0.5)
         ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
         ax.set_xlabel('Time')
         ax.set_ylabel('Processes')
         ax.set_yticks(range(1, len(execution_data) + 1))
         ax.set_yticklabels([f'Process {ed["process_id"]}' for ed in execution_data])
-
-        # Change x-axis locator to integer increments
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
 
-        # Format x-axis labels as integers without leading zeros
         def format_x_ticks(x, pos=None):
             return f'{int(x):d}'
 
         ax.xaxis.set_major_formatter(plt.FuncFormatter(format_x_ticks))
-
-        # Set grid for better readability
         ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5)
-
-        # Plot each process on the Gantt chart
+        cmap = plt.get_cmap('tab10')
         for i, ed in enumerate(execution_data, start=1):
             start_time = ed['start_time']
             end_time = ed['end_time']
             duration = end_time - start_time
-            ax.barh(i, duration, left=start_time, height=0.4, align='center')
-
-            # Annotate the bars with process IDs
+            color = cmap(i % 10)
+            ax.barh(i, duration, left=start_time, height=0.4, align='center', color=color)
             ax.text(start_time + duration / 2, i, f'Process {ed["process_id"]}', ha='center', va='center')
-
-            # Set x-axis limits based on the start and end times
-            ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
-
-        # Save the figure to a file
         plt.savefig('static/gantt_chart2.png')
+
+        waiting_times = []
+        turnaround_times = []
+        print("kleeeeen")
+        print(len(processes))
+        processes = scheduler.processes
+        for i in range(len(processes)):
+            process = utils.find_process_by_id(i + 1, scheduler.processes)
+            waiting_time = process.waiting
+            turnaround_time = process.turnaround
+            waiting_times.append(waiting_time)
+            turnaround_times.append(turnaround_time)
+
+        # Plot bar plot for waiting time
+        plt.figure(figsize=(8, 6))
+        plt.bar(range(1, len(waiting_times) + 1), waiting_times, color='skyblue')
+        plt.xlabel('Process ID')
+        plt.ylabel('Waiting Time')
+        plt.title('Waiting Time for Each Process (SJF)')
+        plt.xticks(range(1, len(waiting_times) + 1))
+        plt.savefig('static/waiting_time_sjf.png')
+
+        # Plot bar plot for turnaround time
+        plt.figure(figsize=(8, 6))
+        plt.bar(range(1, len(turnaround_times) + 1), turnaround_times, color='lightgreen')
+        plt.xlabel('Process ID')
+        plt.ylabel('Turnaround Time')
+        plt.title('Turnaround Time for Each Process (SJF)')
+        plt.xticks(range(1, len(turnaround_times) + 1))
+        plt.savefig('static/turnaround_time_sjf.png')
+        plt.close('all')
+
     if 'Priority' in selected_algorithms:
         # Run Priority Scheduling algorithm
         gantt = scheduler.run_priority_scheduling()
@@ -321,6 +381,16 @@ def entered_processes():
             'total_waiting_time': utils.calculate_total_waiting_time(scheduler.processes),
         }
 
+        # Calculate waiting time and turnaround time for each process
+        waiting_times = []
+        turnaround_times = []
+        for i in range(len(scheduler.processes)):
+            process = utils.find_process_by_id(i+1, scheduler.processes)
+            waiting_time = process.waiting
+            turnaround_time = process.turnaround
+            waiting_times.append(waiting_time)
+            turnaround_times.append(turnaround_time)
+
         # Plot Gantt chart
         fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -331,38 +401,43 @@ def entered_processes():
         ax.set_ylabel('Processes')
         ax.set_yticks(range(1, len(execution_data) + 1))
         ax.set_yticklabels([f'Process {ed["process_id"]}' for ed in execution_data])
-
-        # Change x-axis locator to integer increments
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
 
-        # Format x-axis labels as integers without leading zeros
         def format_x_ticks(x, pos=None):
             return f'{int(x):d}'
 
         ax.xaxis.set_major_formatter(plt.FuncFormatter(format_x_ticks))
-
-        # Set grid for better readability
         ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5)
-
-        # Plot each process on the Gantt chart
+        cmap = plt.get_cmap('tab10')
         for i, ed in enumerate(execution_data, start=1):
             start_time = ed['start_time']
             end_time = ed['end_time']
             duration = end_time - start_time
-            ax.barh(i, duration, left=start_time, height=0.4, align='center')
-
-            # Annotate the bars with process IDs
+            color = cmap(i % 10)
+            ax.barh(i, duration, left=start_time, height=0.4, align='center', color=color)
             ax.text(start_time + duration / 2, i, f'Process {ed["process_id"]}', ha='center', va='center')
-
-            # Set x-axis limits based on the start and end times
-            ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
-        print("sala hna")
-        # Save the figure to a file
         plt.savefig('static/gantt_chart3.png')
+
+        # Plot bar plot for waiting time
+        plt.figure(figsize=(8, 6))
+        plt.bar(range(1, len(waiting_times) + 1), waiting_times, color='skyblue')
+        plt.xlabel('Process ID')
+        plt.ylabel('Waiting Time')
+        plt.title('Waiting Time for Each Process (Priority Scheduling)')
+        plt.xticks(range(1, len(waiting_times) + 1))
+        plt.savefig('static/waiting_time_priority.png')
+
+        # Plot bar plot for turnaround time
+        plt.figure(figsize=(8, 6))
+        plt.bar(range(1, len(turnaround_times) + 1), turnaround_times, color='lightgreen')
+        plt.xlabel('Process ID')
+        plt.ylabel('Turnaround Time')
+        plt.title('Turnaround Time for Each Process (Priority Scheduling)')
+        plt.xticks(range(1, len(turnaround_times) + 1))
+        plt.savefig('static/turnaround_time_priority.png')
+
     if 'RR' in selected_algorithms:
         # Run Round Robin algorithm
-        print("anprinti")
-        print(time_slice)
         gantt = scheduler.run_round_robin(time_slice)
 
         execution_data = []
@@ -387,6 +462,22 @@ def entered_processes():
             'total_waiting_time': utils.calculate_total_waiting_time(scheduler.processes),
         }
 
+        # Calculate waiting time and turnaround time for each process
+        waiting_times = []
+        turnaround_times = []
+        for i in range(len(scheduler.processes)):
+            process = utils.find_process_by_id(i+1, scheduler.processes)
+            waiting_time = process.waiting
+            turnaround_time = process.turnaround
+            waiting_times.append(waiting_time)
+            turnaround_times.append(turnaround_time)
+
+        # Define a colormap
+        cmap = plt.get_cmap('tab10')  # You can choose any colormap here
+
+        # Create a dictionary to store process colors
+        process_colors = {}
+
         # Plot Gantt chart for Round Robin
         fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -397,17 +488,12 @@ def entered_processes():
         ax.set_ylabel('Processes')
         ax.set_yticks(range(1, len(execution_data) + 1))
         ax.set_yticklabels([f'Process {ed["process_id"]}' for ed in execution_data])
-
-        # Change x-axis locator to integer increments
         ax.xaxis.set_major_locator(plt.MultipleLocator(1))
 
-        # Format x-axis labels as integers without leading zeros
         def format_x_ticks(x, pos=None):
             return f'{int(x):d}'
 
         ax.xaxis.set_major_formatter(plt.FuncFormatter(format_x_ticks))
-
-        # Set grid for better readability
         ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5)
 
         # Plot each process on the Gantt chart
@@ -415,16 +501,41 @@ def entered_processes():
             start_time = ed['start_time']
             end_time = ed['end_time']
             duration = end_time - start_time
-            ax.barh(i, duration, left=start_time, height=0.4, align='center')
 
-            # Annotate the bars with process IDs
-            ax.text(start_time + duration / 2, i, f'Process {ed["process_id"]}', ha='center', va='center')
+            process_id = ed["process_id"]
+
+            # Assign color to process if not assigned yet
+            if process_id not in process_colors:
+                process_colors[process_id] = cmap(len(process_colors) % 10)
+
+            color = process_colors[process_id]
+
+            ax.barh(i, duration, left=start_time, height=0.4, align='center', color=color)
+            ax.text(start_time + duration / 2, i, f'Process {process_id}', ha='center', va='center')
 
             # Set x-axis limits based on the start and end times
             ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
 
         # Save the figure to a file
         plt.savefig('static/gantt_chart4.png')
+
+        # Plot bar plot for waiting time
+        plt.figure(figsize=(8, 6))
+        plt.bar(range(1, len(waiting_times) + 1), waiting_times, color='skyblue')
+        plt.xlabel('Process ID')
+        plt.ylabel('Waiting Time')
+        plt.title('Waiting Time for Each Process (Round Robin)')
+        plt.xticks(range(1, len(waiting_times) + 1))
+        plt.savefig('static/waiting_time_rr.png')
+
+        # Plot bar plot for turnaround time
+        plt.figure(figsize=(8, 6))
+        plt.bar(range(1, len(turnaround_times) + 1), turnaround_times, color='lightgreen')
+        plt.xlabel('Process ID')
+        plt.ylabel('Turnaround Time')
+        plt.title('Turnaround Time for Each Process (Round Robin)')
+        plt.xticks(range(1, len(turnaround_times) + 1))
+        plt.savefig('static/turnaround_time_rr.png')
 
     scheduler.processes.sort(key=lambda x: x.id)
     num_processes = len(scheduler.processes)

@@ -34,7 +34,6 @@
     </div>
 
         {% if fcfs_results %}
-
     <div class="img-container">
         <h2>FCFS Results</h2>
         <table class="fcfs-results-table">
@@ -65,7 +64,11 @@
             </tbody>
         </table>
         <h2>Gantt chart for First-come,first-served</h2>
-        <img src="{{ url_for('static', filename='gantt_chart1.png') }}" alt="Gantt Chart">
+        <img src="{{ url_for('static', filename='gantt_chart1.png') }}" alt="Gantt Chart"><br>
+        <div style="display: inline-block;">
+            <img src="{{ url_for('static', filename='turnaround_time_fcfs.png') }}" alt="FCFS Turnaround Chart" style="max-width: 45%;">
+            <img src="{{ url_for('static', filename='waiting_time_fcfs.png') }}" alt="FCFS Waiting Chart" style="max-width: 45%;">
+        </div>
     </div>
             {% endif %}
     {% if sjf_results %}
@@ -101,7 +104,12 @@
     </table>
     <h2>Gantt chart for Shortest Job First</h2>
 
-    <img src="{{ url_for('static', filename='gantt_chart2.png') }}" alt="Gantt Chart">
+    <img src="{{ url_for('static', filename='gantt_chart2.png') }}" alt="Gantt Chart"><br>
+        <div style="display: inline-block;">
+            <img src="{{ url_for('static', filename='turnaround_time_sjf.png') }}" alt="SJF Turnaround Chart" style="max-width: 45%;">
+            <img src="{{ url_for('static', filename='waiting_time_sjf.png') }}" alt="SJF Waiting Chart" style="max-width: 45%;">
+        </div>
+        <br><br><br>
     </div>
         {% endif %}
         {% if priority_results %}
@@ -137,7 +145,11 @@
         </table>
         <h2>Gantt chart for Priority Scheduling</h2>
 
-        <img src="{{ url_for('static', filename='gantt_chart3.png') }}" alt="Gantt Chart">
+        <img src="{{ url_for('static', filename='gantt_chart3.png') }}" alt="Gantt Chart"><br>
+        <div style="display: inline-block;">
+            <img src="{{ url_for('static', filename='turnaround_time_priority.png') }}" alt="Priority Turnaround Chart" style="max-width: 45%;">
+            <img src="{{ url_for('static', filename='waiting_time_priority.png') }}" alt="Priority Waiting Chart" style="max-width: 45%;">
+        </div>
     </div>
         {% endif %}
     {% if rr_results %}
@@ -171,7 +183,11 @@
         </tbody>
     </table>
     <h2>Gantt chart for Round Robin</h2>
-    <img src="{{ url_for('static', filename='gantt_chart4.png') }}" alt="Gantt Chart">
+    <img src="{{ url_for('static', filename='gantt_chart4.png') }}" alt="Gantt Chart"><br>
+       <div style="display: inline-block;">
+            <img src="{{ url_for('static', filename='turnaround_time_rr.png') }}" alt="Round Robin Turnaround Chart" style="max-width: 45%;">
+            <img src="{{ url_for('static', filename='waiting_time_rr.png') }}" alt="Round Robin Waiting Chart" style="max-width: 45%;">
+        </div>
 </div>
 
 {% endif %}

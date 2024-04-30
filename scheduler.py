@@ -156,28 +156,20 @@ class Scheduler:
     def run_round_robin(self, time_slice):
         # Sort processes based on arrival time
         self.processes.sort(key=lambda x: x.arrival_time)
-        print("anchufu")
-        print(time_slice)
         current_time = 0
         remaining_time = [process.burst_time for process in self.processes]
         completed_processes = []
         gantt = []
 
         while any(remaining_time):
-
-
+            executed = False  # Flag to track if any process was executed in this iteration
             for i, process in enumerate(self.processes):
                 if remaining_time[i] == 0:
                     continue
 
-                print(current_time)
                 if process.arrival_time <= current_time:
-                    print("dkhlna if")
                     # Execute the process for the time slice or remaining burst time, whichever is smaller
                     run_time = min(time_slice, remaining_time[i])
-                    print('jrb')
-                    print(run_time)
-                    print(remaining_time)
                     remaining_time[i] -= run_time
 
                     # Update current time
@@ -195,10 +187,12 @@ class Scheduler:
                     turnaround_time = process.finish_time - process.arrival_time if process.finish_time else None
                     print(
                         f"Executing Process {process.id} at Time {current_time - run_time}, Remaining Burst Time: {remaining_time[i]}, Turnaround Time: {turnaround_time}")
-                else:
-                    current_time = process.arrival_time
-            # If all processes are completed, exit the loop
 
+                    executed = True  # Process was executed in this iteration
+
+            if not executed:
+                # If no process was executed, increment current time
+                current_time += 1
 
         # Calculate and display average turnaround time for all processes
         avg_turnaround_time = calculate_average_turnaround_time(completed_processes)

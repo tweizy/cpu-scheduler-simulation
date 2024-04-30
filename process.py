@@ -5,6 +5,8 @@ class Process:
         self.burst_time = burst_time
         self.priority = priority
         self.finish_time = None
+        self.turnaround = 0.0
+        self.waiting = 0.0
 
     @staticmethod
     def sort_by_id(processes):

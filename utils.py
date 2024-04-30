@@ -28,6 +28,7 @@ def calculate_total_turnaround_time(processes):
     print("Turnaround:")
     for process in processes:
         print(f"{process.finish_time - process.arrival_time} + ")
+        process.turnaround = process.finish_time - process.arrival_time
         total_turnaround_time += (process.finish_time - process.arrival_time)
     return total_turnaround_time
 
@@ -36,6 +37,7 @@ def calculate_average_waiting_time(processes):
     print("Waiting time:")
     for process in processes:
         print(f"{(process.finish_time - process.arrival_time) - process.burst_time} + ")
+        process.waiting = (process.finish_time - process.arrival_time) - process.burst_time
         total_waiting_time += (process.finish_time - process.arrival_time) - process.burst_time
     return total_waiting_time / len(processes)
 def calculate_total_waiting_time(processes):
@@ -45,3 +47,9 @@ def calculate_total_waiting_time(processes):
         print(f"{(process.finish_time - process.arrival_time) - process.burst_time} + ")
         total_waiting_time += (process.finish_time - process.arrival_time) - process.burst_time
     return total_waiting_time
+def find_process_by_id(process_id, processes):
+    """Find a process by its ID."""
+    for process in processes:
+        if process.id == process_id:
+            return process
+    return None
