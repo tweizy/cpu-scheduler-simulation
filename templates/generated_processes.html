@@ -10,18 +10,28 @@
     {% include 'home_button.html' %}
 
     <div class="container">
-        <h1 class="title">Generated Processes</h1>
-        <div class="processes">
-            {% for process in processes %}
-            <div class="process">
-                <p><strong>Arrival Time:</strong> {{ process.arrival_time }}</p>
-                <p><strong>Burst Time:</strong> {{ process.burst_time }}</p>
-                {% if process.priority %}
-                <p><strong>Priority:</strong> {{ process.priority }}</p>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
+        <h1 class="title">Entered Processes</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Process ID</th>
+                    <th>Arrival Time</th>
+                    <th>Burst Time</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for process in processes %}
+                <tr>
+                    <td>{{process.process_id}}</td>
+                    <td>{{ process.arrival_time}}</td>
+                    <td>{{ process.burst_time}}</td>
+                    <td>{{ process.priority}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+
 </body>
 </html>
