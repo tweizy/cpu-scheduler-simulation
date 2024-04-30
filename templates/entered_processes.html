@@ -73,5 +73,38 @@
         <img src="{{ url_for('static', filename='gantt_chart1.png') }}" alt="Gantt Chart">
         {% endif %}
     </div>
+    <div class="img-container">
+    {% if sjf_results %}
+    <h2>SJF Results</h2>
+    <table class="sjf-results-table">
+        <thead>
+            <tr>
+                <th>Statistic</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Average Turnaround Time</td>
+                <td>{{ sjf_results.avg_turnaround_time }}</td>
+            </tr>
+            <tr>
+                <td>Average Waiting Time</td>
+                <td>{{ sjf_results.avg_waiting_time }}</td>
+            </tr>
+            <tr>
+                <td>Total Turnaround Time</td>
+                <td>{{ sjf_results.total_turnaround_time }}</td>
+            </tr>
+            <tr>
+                <td>Total Waiting Time</td>
+                <td>{{ sjf_results.total_waiting_time }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <img src="{{ url_for('static', filename='gantt_chart2.png') }}" alt="Gantt Chart">
+    {% endif %}
+    </div>
+
 </body>
 </html>

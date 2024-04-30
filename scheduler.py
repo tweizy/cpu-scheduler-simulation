@@ -47,14 +47,15 @@ class Scheduler:
     def run_SJF(self):
         # Sort processes based on arrival time
         self.processes.sort(key=lambda x: x.arrival_time)
-        
+        original = [i for i in self.processes]
         current_time = 0
+        gantt = []
         completed_processes = []
 
         while self.processes:
             # Find processes that have arrived before or at the current time
             available_processes = [process for process in self.processes if process.arrival_time <= current_time]
-            
+
             if not available_processes:
                 # If no processes are available, move time to the next arrival time
                 current_time = self.processes[0].arrival_time
@@ -63,7 +64,14 @@ class Scheduler:
             # Select the process with the minimum burst time among available processes
             shortest_job = min(available_processes, key=lambda x: x.burst_time)
 
-            # Update current time
+            # Ensure current time is at least the arrival time of the shortest job
+            if current_time < shortest_job.arrival_time:
+                current_time = shortest_job.arrival_time
+
+            # Execute the shortest job
+            print(f"Executing Process {shortest_job.id} at Time {current_time}")
+            gantt.append((shortest_job.id, shortest_job.burst_time))
+            # Update current time to account for process burst time
             current_time += shortest_job.burst_time
 
             # Set finish time of the process
@@ -71,18 +79,23 @@ class Scheduler:
 
             # Calculate and display turnaround time for the process
             turnaround_time = shortest_job.finish_time - shortest_job.arrival_time
-            print(f"Executing Process {shortest_job.id} at Time {current_time - shortest_job.burst_time}")
             print(f"Process {shortest_job.id} completed. Turnaround Time: {turnaround_time}")
 
             # Remove the completed process from the list of processes
             self.processes.remove(shortest_job)
             completed_processes.append(shortest_job)
+        self.processes = [i for i in original]
 
         # Calculate and display average turnaround time for all processes
         avg_turnaround_time = calculate_average_turnaround_time(completed_processes)
         avg_waiting_time = calculate_average_waiting_time(completed_processes)
+        total_turnaround_time = calculate_total_turnaround_time(completed_processes)
+        total_waiting_time = calculate_total_waiting_time(completed_processes)
         print(f"Average Turnaround Time (SJF): {avg_turnaround_time}")
         print(f"Average Waiting Time (SJF): {avg_waiting_time}")
+        print(f"Total Turnaround Time (SJF): {total_turnaround_time}")
+        print(f"Total Waiting Time (SJF): {total_waiting_time}")
+        return gantt
 
     def run_priority_scheduling(self):
         # Sort processes based on arrival time and priority
