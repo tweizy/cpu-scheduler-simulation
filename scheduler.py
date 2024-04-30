@@ -100,14 +100,16 @@ class Scheduler:
     def run_priority_scheduling(self):
         # Sort processes based on arrival time and priority
         self.processes.sort(key=lambda x: (x.arrival_time, -x.priority))
+        original = [i for i in self.processes]
 
         current_time = 0
+        gantt = []
         completed_processes = []
 
         while self.processes:
             # Find processes that have arrived before or at the current time
             available_processes = [process for process in self.processes if process.arrival_time <= current_time]
-            
+
             if not available_processes:
                 # If no processes are available, move time to the next arrival time
                 current_time = self.processes[0].arrival_time
@@ -116,7 +118,14 @@ class Scheduler:
             # Select the process with the highest priority among available processes
             highest_priority_process = max(available_processes, key=lambda x: x.priority)
 
-            # Update current time
+            # Ensure current time is at least the arrival time of the highest priority process
+            if current_time < highest_priority_process.arrival_time:
+                current_time = highest_priority_process.arrival_time
+
+            # Execute the highest priority process
+            print(f"Executing Process {highest_priority_process.id} at Time {current_time}")
+            gantt.append((highest_priority_process.id, highest_priority_process.burst_time))
+            # Update current time to account for process burst time
             current_time += highest_priority_process.burst_time
 
             # Set finish time of the process
@@ -124,18 +133,25 @@ class Scheduler:
 
             # Calculate and display turnaround time for the process
             turnaround_time = highest_priority_process.finish_time - highest_priority_process.arrival_time
-            print(f"Executing Process {highest_priority_process.id} at Time {current_time - highest_priority_process.burst_time}")
             print(f"Process {highest_priority_process.id} completed. Turnaround Time: {turnaround_time}")
 
             # Remove the completed process from the list of processes
             self.processes.remove(highest_priority_process)
             completed_processes.append(highest_priority_process)
 
+        self.processes = [i for i in original]
+
         # Calculate and display average turnaround time for all processes
         avg_turnaround_time = calculate_average_turnaround_time(completed_processes)
         avg_waiting_time = calculate_average_waiting_time(completed_processes)
+        total_turnaround_time = calculate_total_turnaround_time(completed_processes)
+        total_waiting_time = calculate_total_waiting_time(completed_processes)
         print(f"Average Turnaround Time (Priority Scheduling): {avg_turnaround_time}")
         print(f"Average Waiting Time (Priority Scheduling): {avg_waiting_time}")
+        print(f"Total Turnaround Time (Priority Scheduling): {total_turnaround_time}")
+        print(f"Total Waiting Time (Priority Scheduling): {total_waiting_time}")
+
+        return gantt
 
     def run_round_robin(self, time_slice):
         # Sort processes based on arrival time

@@ -118,6 +118,7 @@ def entered_processes():
     scheduler = Scheduler(processes)
     fcfs_results = []
     sjf_results = []
+    priority_results = []
     # Check if FCFS algorithm is selected
     if 'FCFS' in selected_algorithms:
         # Process the form data to create a list of Process objects
@@ -251,10 +252,74 @@ def entered_processes():
 
         # Save the figure to a file
         plt.savefig('static/gantt_chart2.png')
-        scheduler.processes.sort(key=lambda x: x.id)
-        num_processes = len(scheduler.processes)
+    if 'Priority' in selected_algorithms:
+        # Run Priority Scheduling algorithm
+        gantt = scheduler.run_priority_scheduling()
+
+        execution_data = []
+
+        # Process the gantt data to create execution intervals
+        current_time = 0
+        for process_id, burst_time in gantt:
+            start_time = current_time
+            end_time = current_time + burst_time
+            execution_data.append({'process_id': process_id, 'start_time': start_time, 'end_time': end_time})
+            current_time = end_time
+
+        # Sort execution_data by process IDs
+        execution_data.sort(key=lambda x: x['process_id'])
+
+        # Store Priority Scheduling algorithm results
+        priority_results = {
+            'avg_turnaround_time': utils.calculate_average_turnaround_time(scheduler.processes),
+            'avg_waiting_time': utils.calculate_average_waiting_time(scheduler.processes),
+            'total_turnaround_time': utils.calculate_total_turnaround_time(scheduler.processes),
+            'total_waiting_time': utils.calculate_total_waiting_time(scheduler.processes),
+        }
+
+        # Plot Gantt chart
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Set up the axes formatting
+        ax.set_ylim(0.5, len(execution_data) + 0.5)
+        ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Processes')
+        ax.set_yticks(range(1, len(execution_data) + 1))
+        ax.set_yticklabels([f'Process {ed["process_id"]}' for ed in execution_data])
+
+        # Change x-axis locator to integer increments
+        ax.xaxis.set_major_locator(plt.MultipleLocator(1))
+
+        # Format x-axis labels as integers without leading zeros
+        def format_x_ticks(x, pos=None):
+            return f'{int(x):d}'
+
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(format_x_ticks))
+
+        # Set grid for better readability
+        ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5)
+
+        # Plot each process on the Gantt chart
+        for i, ed in enumerate(execution_data, start=1):
+            start_time = ed['start_time']
+            end_time = ed['end_time']
+            duration = end_time - start_time
+            ax.barh(i, duration, left=start_time, height=0.4, align='center')
+
+            # Annotate the bars with process IDs
+            ax.text(start_time + duration / 2, i, f'Process {ed["process_id"]}', ha='center', va='center')
+
+            # Set x-axis limits based on the start and end times
+            ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
+
+        # Save the figure to a file
+        plt.savefig('static/gantt_chart3.png')
+
+    scheduler.processes.sort(key=lambda x: x.id)
+    num_processes = len(scheduler.processes)
     # Pass the entered processes, selected algorithms, and FCFS algorithm results to the template
-    return render_template('entered_processes.html', processes=scheduler.processes, selected_algorithms=selected_algorithms, sjf_results=sjf_results, fcfs_results=fcfs_results, execution_data=execution_data, num_processes = num_processes)
+    return render_template('entered_processes.html', processes=scheduler.processes, selected_algorithms=selected_algorithms, sjf_results=sjf_results, fcfs_results=fcfs_results, execution_data=execution_data, num_processes = num_processes, priority_results = priority_results)
 
 if __name__ == '__main__':
     app.run(debug=True)
