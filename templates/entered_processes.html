@@ -33,9 +33,9 @@
         </table>
     </div>
 
+        {% if fcfs_results %}
 
     <div class="img-container">
-        {% if fcfs_results %}
         <h2>FCFS Results</h2>
         <table class="fcfs-results-table">
             <thead>
@@ -66,10 +66,11 @@
         </table>
         <h2>Gantt chart for First-come,first-served</h2>
         <img src="{{ url_for('static', filename='gantt_chart1.png') }}" alt="Gantt Chart">
-        {% endif %}
     </div>
-    <div class="img-container">
+            {% endif %}
     {% if sjf_results %}
+
+    <div class="img-container">
     <h2>SJF Results</h2>
     <table class="sjf-results-table">
         <thead>
@@ -101,10 +102,11 @@
     <h2>Gantt chart for Shortest Job First</h2>
 
     <img src="{{ url_for('static', filename='gantt_chart2.png') }}" alt="Gantt Chart">
-    {% endif %}
     </div>
-    <div class="img-container">
+        {% endif %}
         {% if priority_results %}
+
+    <div class="img-container">
         <h2>Priority Scheduling Results</h2>
         <table class="priority-results-table">
             <thead>
@@ -136,8 +138,44 @@
         <h2>Gantt chart for Priority Scheduling</h2>
 
         <img src="{{ url_for('static', filename='gantt_chart3.png') }}" alt="Gantt Chart">
-        {% endif %}
     </div>
+        {% endif %}
+    {% if rr_results %}
+
+<div class="img-container">
+    <h2>Round Robin Results</h2>
+    <table class="rr-results-table">
+        <thead>
+            <tr>
+                <th>Statistic</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Total Turnaround Time</td>
+                <td>{{ rr_results.total_turnaround_time }}</td>
+            </tr>
+            <tr>
+                <td>Total Waiting Time</td>
+                <td>{{ rr_results.total_waiting_time }}</td>
+            </tr>
+            <tr>
+                <td>Average Turnaround Time</td>
+                <td>{{ rr_results.total_turnaround_time }} / {{ num_processes }} = {{ rr_results.avg_turnaround_time }}</td>
+            </tr>
+            <tr>
+                <td>Average Waiting Time</td>
+                <td>{{ rr_results.total_waiting_time }} / {{ num_processes }} = {{ rr_results.avg_waiting_time }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>Gantt chart for Round Robin</h2>
+    <img src="{{ url_for('static', filename='gantt_chart4.png') }}" alt="Gantt Chart">
+</div>
+
+{% endif %}
+
 
 
 </body>

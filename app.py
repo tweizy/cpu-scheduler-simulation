@@ -50,8 +50,10 @@ def upload():
 def enter():
     if request.method == 'POST':
         num_processes = int(request.form['num_processes'])
+
         session['num_processes'] = num_processes
         session['priority_applicable'] = 'priority_applicable' in request.form
+
         return redirect(url_for('enter_details'))
     return render_template('enter.html')
 
@@ -60,7 +62,10 @@ def enter():
 def enter_details():
     num_processes = session.get('num_processes')
     priority_applicable = session.get('priority_applicable')
-    selected_algorithms = request.form.getlist('algorithm[]')  # Retrieve selected algorithms from the form
+    selected_algorithms = request.form.getlist('algorithm[]')
+    time_slice = int(request.form.get('time_slice', 5))
+
+    # Retrieve selected algorithms from the form
     if num_processes is None:
         return redirect(url_for('enter'))
     print(request.method)
@@ -68,6 +73,7 @@ def enter_details():
         processes = []
         for i in range(num_processes):
             arrival_time = request.form[f'arrival_time_{i}']
+
             burst_time = request.form[f'burst_time_{i}']
             priority = request.form.get(f'priority_{i}') if priority_applicable else None
 
@@ -78,14 +84,16 @@ def enter_details():
         processes = sorted(processes, key=lambda x: int(x['process_id']))
         # Store form data in the session
         session['entered_processes_data'] = {
+            'time_slice'  : time_slice,
             'processes': processes,
             'selected_algorithms': selected_algorithms
         }
-
+        print("omaaar")
+        print(time_slice)
         return redirect(url_for('entered_processes'))  # Redirect to the entered_processes route
     else:
         print("basma")
-        return render_template('enter_details.html', num_processes=num_processes, priority_applicable=priority_applicable)
+        return render_template('enter_details.html', num_processes=num_processes, priority_applicable=priority_applicable, time_slice = time_slice)
 
 
 
@@ -94,6 +102,9 @@ def enter_details():
 def entered_processes():
     # Retrieve entered details from the session
     entered_processes_data = session.get('entered_processes_data')
+    time_slice = entered_processes_data['time_slice']
+    print("yjfhgkkj")
+    print(time_slice)
     if entered_processes_data is None:
         # Handle case where session data is missing or invalid
         return redirect(url_for('enter'))
@@ -119,6 +130,8 @@ def entered_processes():
     fcfs_results = []
     sjf_results = []
     priority_results = []
+    execution_data = []
+    rr_results = []
     # Check if FCFS algorithm is selected
     if 'FCFS' in selected_algorithms:
         # Process the form data to create a list of Process objects
@@ -312,14 +325,80 @@ def entered_processes():
 
             # Set x-axis limits based on the start and end times
             ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
-
+        print("sala hna")
         # Save the figure to a file
         plt.savefig('static/gantt_chart3.png')
+    if 'RR' in selected_algorithms:
+        # Run Round Robin algorithm
+        print("anprinti")
+        print(time_slice)
+        gantt = scheduler.run_round_robin(time_slice)
+
+        execution_data = []
+
+        # Process the gantt data to create execution intervals
+        current_time = 0
+
+        for process_id, run_time in gantt:
+            start_time = current_time
+            end_time = current_time + run_time
+            execution_data.append({'process_id': process_id, 'start_time': start_time, 'end_time': end_time})
+            current_time = end_time
+
+        # Sort execution_data by process IDs
+        execution_data.sort(key=lambda x: x['process_id'])
+
+        # Store Round Robin algorithm results
+        rr_results = {
+            'avg_turnaround_time': utils.calculate_average_turnaround_time(scheduler.processes),
+            'avg_waiting_time': utils.calculate_average_waiting_time(scheduler.processes),
+            'total_turnaround_time': utils.calculate_total_turnaround_time(scheduler.processes),
+            'total_waiting_time': utils.calculate_total_waiting_time(scheduler.processes),
+        }
+
+        # Plot Gantt chart for Round Robin
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Set up the axes formatting
+        ax.set_ylim(0.5, len(execution_data) + 0.5)
+        ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Processes')
+        ax.set_yticks(range(1, len(execution_data) + 1))
+        ax.set_yticklabels([f'Process {ed["process_id"]}' for ed in execution_data])
+
+        # Change x-axis locator to integer increments
+        ax.xaxis.set_major_locator(plt.MultipleLocator(1))
+
+        # Format x-axis labels as integers without leading zeros
+        def format_x_ticks(x, pos=None):
+            return f'{int(x):d}'
+
+        ax.xaxis.set_major_formatter(plt.FuncFormatter(format_x_ticks))
+
+        # Set grid for better readability
+        ax.grid(True, which='both', axis='both', linestyle='--', linewidth=0.5)
+
+        # Plot each process on the Gantt chart
+        for i, ed in enumerate(execution_data, start=1):
+            start_time = ed['start_time']
+            end_time = ed['end_time']
+            duration = end_time - start_time
+            ax.barh(i, duration, left=start_time, height=0.4, align='center')
+
+            # Annotate the bars with process IDs
+            ax.text(start_time + duration / 2, i, f'Process {ed["process_id"]}', ha='center', va='center')
+
+            # Set x-axis limits based on the start and end times
+            ax.set_xlim(0, max(ed['end_time'] for ed in execution_data))
+
+        # Save the figure to a file
+        plt.savefig('static/gantt_chart4.png')
 
     scheduler.processes.sort(key=lambda x: x.id)
     num_processes = len(scheduler.processes)
     # Pass the entered processes, selected algorithms, and FCFS algorithm results to the template
-    return render_template('entered_processes.html', processes=scheduler.processes, selected_algorithms=selected_algorithms, sjf_results=sjf_results, fcfs_results=fcfs_results, execution_data=execution_data, num_processes = num_processes, priority_results = priority_results)
+    return render_template('entered_processes.html', processes=scheduler.processes, selected_algorithms=selected_algorithms, sjf_results=sjf_results, fcfs_results=fcfs_results, execution_data=execution_data, num_processes = num_processes, priority_results = priority_results, rr_results = rr_results)
 
 if __name__ == '__main__':
     app.run(debug=True)
