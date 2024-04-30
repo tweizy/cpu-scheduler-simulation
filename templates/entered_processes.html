@@ -32,14 +32,7 @@
             </tbody>
         </table>
     </div>
-    <h2>Selected Algorithms:</h2>
-    <div class="selected-algos">
-        <ul>
-            {% for algorithm in selected_algorithms %}
-            <li>{{ algorithm }}</li>
-            {% endfor %}
-        </ul>
-    </div>
+
 
     <div class="img-container">
         {% if fcfs_results %}
@@ -53,14 +46,6 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>Average Turnaround Time</td>
-                    <td>{{ fcfs_results.avg_turnaround_time }}</td>
-                </tr>
-                <tr>
-                    <td>Average Waiting Time</td>
-                    <td>{{ fcfs_results.avg_waiting_time }}</td>
-                </tr>
-                <tr>
                     <td>Total Turnaround Time</td>
                     <td>{{ fcfs_results.total_turnaround_time }}</td>
                 </tr>
@@ -68,8 +53,18 @@
                     <td>Total Waiting Time</td>
                     <td>{{ fcfs_results.total_waiting_time }}</td>
                 </tr>
+                <tr>
+                <td>Average Turnaround Time</td>
+                <td>{{ fcfs_results.total_turnaround_time }} / {{num_processes}} = {{ fcfs_results.avg_turnaround_time }}</td>
+            </tr>
+            <tr>
+                <td>Average Waiting Time</td>
+                <td>{{ fcfs_results.total_waiting_time }} / {{num_processes}} = {{ fcfs_results.avg_waiting_time }}</td>
+            </tr>
+
             </tbody>
         </table>
+        <h2>Gantt chart for First-come,first-served</h2>
         <img src="{{ url_for('static', filename='gantt_chart1.png') }}" alt="Gantt Chart">
         {% endif %}
     </div>
@@ -85,14 +80,6 @@
         </thead>
         <tbody>
             <tr>
-                <td>Average Turnaround Time</td>
-                <td>{{ sjf_results.avg_turnaround_time }}</td>
-            </tr>
-            <tr>
-                <td>Average Waiting Time</td>
-                <td>{{ sjf_results.avg_waiting_time }}</td>
-            </tr>
-            <tr>
                 <td>Total Turnaround Time</td>
                 <td>{{ sjf_results.total_turnaround_time }}</td>
             </tr>
@@ -100,8 +87,19 @@
                 <td>Total Waiting Time</td>
                 <td>{{ sjf_results.total_waiting_time }}</td>
             </tr>
+            <tr>
+                <td>Average Turnaround Time</td>
+                <td>{{ sjf_results.total_turnaround_time }} / {{num_processes}} = {{ sjf_results.avg_turnaround_time }}</td>
+            </tr>
+            <tr>
+                <td>Average Waiting Time</td>
+                <td>{{ sjf_results.total_waiting_time }} / {{num_processes}} = {{ sjf_results.avg_waiting_time }}</td>
+            </tr>
+
         </tbody>
     </table>
+    <h2>Gantt chart for Shortest Job First</h2>
+
     <img src="{{ url_for('static', filename='gantt_chart2.png') }}" alt="Gantt Chart">
     {% endif %}
     </div>

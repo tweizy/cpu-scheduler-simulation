@@ -251,9 +251,10 @@ def entered_processes():
 
         # Save the figure to a file
         plt.savefig('static/gantt_chart2.png')
-
+        scheduler.processes.sort(key=lambda x: x.id)
+        num_processes = len(scheduler.processes)
     # Pass the entered processes, selected algorithms, and FCFS algorithm results to the template
-    return render_template('entered_processes.html', processes=processes, selected_algorithms=selected_algorithms, sjf_results=sjf_results, fcfs_results=fcfs_results, execution_data=execution_data)
+    return render_template('entered_processes.html', processes=scheduler.processes, selected_algorithms=selected_algorithms, sjf_results=sjf_results, fcfs_results=fcfs_results, execution_data=execution_data, num_processes = num_processes)
 
 if __name__ == '__main__':
     app.run(debug=True)
