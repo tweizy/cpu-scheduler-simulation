@@ -9,29 +9,45 @@
 </head>
 <body>
     {% include 'home_button.html' %}
-    <div class="container">
-        <h1 class="title">Entered Processes</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>Process ID</th>
-                    <th>Arrival Time</th>
-                    <th>Burst Time</th>
-                    <th>Priority</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for process in processes %}
-                <tr>
-                    <td>{{process.id}}</td>
-                    <td>{{ process.arrival_time}}</td>
-                    <td>{{ process.burst_time}}</td>
-                    <td>{{ process.priority}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+   <div class="container">
+    <h1 class="title">Entered Processes</h1>
+    <table id="processesTable">
+        <thead>
+            <tr>
+                <th>Process ID</th>
+                <th>Arrival Time</th>
+                <th>Burst Time</th>
+                <th>Priority</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for process in processes %}
+            <tr>
+                <td contenteditable="true">{{ process.id }}</td>
+                <td contenteditable="true">{{ process.arrival_time }}</td>
+                <td contenteditable="true">{{ process.burst_time }}</td>
+                <td contenteditable="true">{{ process.priority }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Enable inline editing for table cells
+    const cells = document.querySelectorAll('#processesTable td[contenteditable="true"]');
+    cells.forEach(cell => {
+        cell.addEventListener('blur', () => {
+            // Update the value of the corresponding process attribute
+            const rowIndex = cell.parentNode.rowIndex - 1; // Adjusting for the header row
+            const colIndex = cell.cellIndex;
+            const value = cell.innerText.trim();
+            // Update the corresponding process attribute using AJAX or other method
+            // For example, you can send the updated value to the server to save it
+            console.log(`Updated value at row ${rowIndex}, column ${colIndex}: ${value}`);
+        });
+    });
+</script>
 
         {% if fcfs_results %}
     <div class="img-container">
