@@ -34,12 +34,44 @@ def generate_random_processes(num_processes, arrival_range, burst_range, priorit
 
 @app.route('/generate', methods=['GET', 'POST'])
 def generate():
+    if request.method == 'POST':
         num_processes = int(request.form['num_processes'])
+
         arrival_range = request.form['arrival_time_range']
         burst_range = request.form['burst_time_range']
-        priority_range = request.form['priority_range'] if 'priority_range' in request.form else None
+        priority_range = request.form.get('priority_range')
+        selected_algorithms = request.form.getlist('algorithm[]')
+        if request.form.get('time_slice'):
+            time_slice = int(request.form.get('time_slice', 5))
+        else:
+            time_slice = 5
+        print("ha time")
+        print(time_slice)
+        # Generate random processes
         processes = generate_random_processes(num_processes, arrival_range, burst_range, priority_range)
-        return render_template('generated_processes.html', processes=processes)
+
+        # Store form data in the session
+        session['entered_processes_data'] = {
+            'processes': processes,
+            'arrival_range': arrival_range,
+            'burst_range': burst_range,
+            'priority_range': priority_range,
+            'selected_algorithms': selected_algorithms,
+            'time_slice': time_slice
+        }
+        print(session)
+        # Redirect to the route for displaying generated processes
+        return redirect(url_for('entered_processes'))  # Redirect to the entered_processes route
+
+    return render_template('generate.html', num_processes=num_processes,
+                           time_slice=time_slice)
+
+
+@app.route('/generated_processes')
+def display_generated_processes():
+    generated_processes_data = session.get('generated_processes_data', {})
+    return render_template('generated_processes.html', data=generated_processes_data)
+
 
 @app.route('/upload')
 def upload():

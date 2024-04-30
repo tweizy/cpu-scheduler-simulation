@@ -27,7 +27,36 @@
                 <label for="priority_range">Priority Range (min, max): (if applicable)</label>
                 <input type="text" id="priority_range" name="priority_range" placeholder="e.g., 1, 5" >
             </div>
-            <button type="submit" class="btn-submit">Generate Processes</button>
+    </div>
+    <h1 class="title">Algorithm Selection</h1>
+                <div class="form-group">
+            <label>Select Scheduling Algorithm(s):</label><br>
+            <input type="checkbox" name="algorithm[]" id="FCFS" value="FCFS">
+            <label for="FCFS">First-Come, First-Served (FCFS)</label><br>
+            <input type="checkbox" name="algorithm[]" id="SJF" value="SJF">
+            <label for="SJF">Shortest Job First (SJF)</label><br>
+            <input type="checkbox" name="algorithm[]" id="Priority" value="Priority">
+            <label for="Priority">Priority Scheduling</label><br>
+            <input type="checkbox" name="algorithm[]" id="RR" value="RR" onchange="toggleTimeSliceRequired()" placeholder="By default 2">
+            <label for="RR">Round Robin (RR)</label>
+            <td><input type="number" name="time_slice" id="time_slice" min="0"></td>
+            <br>
+            <input type="checkbox" name="algorithm[]" id="Priority_RR" value="Priority_RR">
+            <label for="Priority_RR">Priority Scheduling + RR</label><br>
+        </div>
+            <button type="submit" class="btn-submit">Submit</button>
+                <script>
+function toggleTimeSliceRequired() {
+    var rrCheckbox = document.getElementById("RR");
+    var timeSliceInput = document.getElementById("time_slice");
+
+    if (rrCheckbox.checked) {
+        timeSliceInput.required = true;
+    } else {
+        timeSliceInput.required = false;
+    }
+}
+</script>
         </form>
     </div>
 </body>
